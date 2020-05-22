@@ -1,0 +1,12 @@
+{
+  "extends": "xo/esnext",
+  "rules": {
+    "indent": "off",
+    "camelcase": "off",
+    "no-extra-boolean-cast": "off",
+    "capitalized-comments": "off",
+    "space-before-function-paren": "off",
+    "object-curly-spacing": "off",
+    "prefer-arrow-callback": "off"
+  }
+}
