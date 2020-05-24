@@ -1,6 +1,6 @@
 FROM neilpang/acme.sh
 
-RUN apk --update add nodejs npm
+RUN apk --update add nodejs npm curl
 
 WORKDIR /app
 
