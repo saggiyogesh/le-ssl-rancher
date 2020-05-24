@@ -24,6 +24,8 @@ exports.getCert = async function(domain) {
     Boolean(DEBUG) ? '--debug' : ''
   } --dns ${ACME_SH_DNS} -d '${domain}' --force  --nocron  --accountemail ${ACCOUNT_EMAIL}`;
 
+  console.log('CMD-->', CMD);
+  
   const subprocess = execa('sh', [CMD], { shell: true });
   subprocess.stdout.pipe(process.stdout);
   subprocess.stderr.pipe(process.stderr);
