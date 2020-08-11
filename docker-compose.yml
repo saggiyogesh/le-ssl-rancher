@@ -1,0 +1,12 @@
+version: '3'
+services:
+  test:
+    image: sharma22/hello
+    environment:
+      - ACCOUNT_EMAIL=harshsharma199622@gmail.com
+      - API_KEY=token-kvgb4:rxw9chrm4zlc89swwlzxqw6chh6rsjcvwgbjg4s724hvtmwgv8vtk4
+      - GD_Key=dKNjuoWhKp8G_NEu1t5sekmNmquwRDTbsgo
+      - GD_Secret=CvgLfhkLa4DeyBXZy9E5hJ
+      - RANCHER_SERVER_API=https://rancher-master.learnindialearn.org/v3
+      - LE_USE_STAGING=true
+

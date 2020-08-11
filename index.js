@@ -110,6 +110,51 @@ fastify.get('/', async () => {
   return 'OK';
 });
 
+fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply) => {
+  const { domain } = request.body;
+
+  const certSecretName = `${domain.replace(/\./g, '-').replace(/\*/g, 'wildcard')}-ssl-certs`;
+  // let certObj = db
+  //   .get('certs')
+  //   .find({ name: certSecretName })
+  //   .value();
+  const renewedCertObj = await renewCert(domain)
+
+  let projObj = db
+    .get('projectIds')
+    .find({certSecretName: certSecretName})
+    .value();
+
+  //certObj = certObj || {};
+
+//  console.log('insertDomainSecret inputs ---', domain, projectId, certSecretName, certObj);
+  
+  let { keyFile, cerFile } = renewedCertObj;
+  
+  const { keyFileData, cerFileData } = getCertData(keyFile, cerFile);
+  for( const _currentProj of projObj){
+  const rancherCertURL = `/project/${projectId}/certificates`;
+
+  const { data } = await instance.get(`${rancherCertURL}?name=${certSecretName}`);
+  console.log('cert name if exists in project--->>>', data && data.name);
+
+  if (data.data && data.data.length) {
+    // cert exists on rancher, update it
+    console.log('cert id--', data.data[0].id);
+    const certId = data.data[0].id;
+    // const { data: d } = await instance.get(`${rancherCertURL}/${certId}`);
+    // console.log('cert data--', d);
+    const { data: d1 } = await instance.put(`${rancherCertURL}/${certId}`, {
+      id: certId,
+      key: keyFileData,
+      certs: cerFileData
+    });
+
+    console.log('update ssl cert', domain, d1.name);
+  } 
+  }
+});
+
 // Run the server!
 fastify.listen(process.env.PORT || 80, function(err, address) {
   if (err) {
