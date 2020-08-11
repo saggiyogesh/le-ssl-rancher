@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const { API_KEY, RANCHER_SERVER_API, LE_CONFIG_HOME } = process.env;
 
 const fastify = require('fastify')({
@@ -9,7 +10,7 @@ const axios = require('axios');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 
-const { getCert, getCertData } = require('./cert');
+const { getCert, getCertData, renewCert} = require('./cert');
 
 assert(RANCHER_SERVER_API);
 assert(API_KEY);
@@ -118,23 +119,24 @@ fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply
   //   .get('certs')
   //   .find({ name: certSecretName })
   //   .value();
-  const renewedCertObj = await renewCert(domain)
+  const renewedCertObj = await renewCert(domain);
 
-  let projObj = db
+  const projObj = db
     .get('projectIds')
-    .find({certSecretName: certSecretName})
+    .find({certSecretName})
     .value();
 
-  //certObj = certObj || {};
+  // certObj = certObj || {};
 
 //  console.log('insertDomainSecret inputs ---', domain, projectId, certSecretName, certObj);
-  
-  let { keyFile, cerFile } = renewedCertObj;
-  
-  const { keyFileData, cerFileData } = getCertData(keyFile, cerFile);
-  for( const _currentProj of projObj){
-  const rancherCertURL = `/project/${projectId}/certificates`;
 
+  const { keyFile, cerFile } = renewedCertObj;
+
+  const { keyFileData, cerFileData } = getCertData(keyFile, cerFile);
+  for (const _currentProj of projObj) {
+  const rancherCertURL = `/project/${_currentProj.projectId}/certificates`;
+
+  // eslint-disable-next-line no-await-in-loop
   const { data } = await instance.get(`${rancherCertURL}?name=${certSecretName}`);
   console.log('cert name if exists in project--->>>', data && data.name);
 
@@ -151,7 +153,7 @@ fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply
     });
 
     console.log('update ssl cert', domain, d1.name);
-  } 
+  }
   }
 });
 
