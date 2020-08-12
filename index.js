@@ -43,7 +43,7 @@ const postSchema = {
 fastify.post('/insertDomainSecret', { schema: postSchema }, async (request, reply) => {
   const { domain, projectId } = request.body;
 
-  const certSecretName = await getSecretNameFromDomain(domain)
+  const certSecretName =  getSecretNameFromDomain(domain)
   let certObj = db
     .get('certs')
     .find({ name: certSecretName })
@@ -114,7 +114,7 @@ fastify.get('/', async () => {
 fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply) => {
   const { domain } = request.body;
 
-  const certSecretName = await getSecretNameFromDomain(domain);
+  const certSecretName = getSecretNameFromDomain(domain);
   // let certObj = db
   //   .get('certs')
   //   .find({ name: certSecretName })
