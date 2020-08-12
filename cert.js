@@ -18,7 +18,7 @@ if (ACME_SH_DNS === 'dns_gd') {
 }
 
 // const certName = `${DOMAIN_NAME.replace(/\./g, '-').replace(/\*/g, 'wildcard')}-ssl-certs`;
-exports.createWildCardName = async function(domain) {
+exports.getSecretNameFromDomain = async function(domain) {
   return `${domain.replace(/\./g, '-').replace(/\*/g, 'wildcard')}-ssl-certs`;
 };
 
