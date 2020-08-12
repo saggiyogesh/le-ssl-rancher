@@ -18,6 +18,9 @@ if (ACME_SH_DNS === 'dns_gd') {
 }
 
 // const certName = `${DOMAIN_NAME.replace(/\./g, '-').replace(/\*/g, 'wildcard')}-ssl-certs`;
+exports.createWildCardName = async function(domain) {
+  return `${domain.replace(/\./g, '-').replace(/\*/g, 'wildcard')}-ssl-certs`;
+};
 
 exports.getCert = async function(domain) {
   const CMD = `/root/.acme.sh/acme.sh --issue  ${Boolean(LE_USE_STAGING) ? '--staging' : ''} ${
