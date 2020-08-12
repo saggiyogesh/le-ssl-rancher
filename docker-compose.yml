@@ -1,7 +1,7 @@
 version: '3'
 services:
   test:
-    image: sharma22/hello
+    image: sharma22/try2
     environment:
       - ACCOUNT_EMAIL=harshsharma199622@gmail.com
       - API_KEY=token-kvgb4:rxw9chrm4zlc89swwlzxqw6chh6rsjcvwgbjg4s724hvtmwgv8vtk4

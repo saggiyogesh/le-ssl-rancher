@@ -25,7 +25,34 @@ exports.getCert = async function(domain) {
   } --dns ${ACME_SH_DNS} -d '${domain}' --force  --nocron  --accountemail ${ACCOUNT_EMAIL}`;
 
   console.log('CMD-->', CMD);
-  
+
+  const subprocess = execa('sh', [CMD], { shell: true });
+  subprocess.stdout.pipe(process.stdout);
+  subprocess.stderr.pipe(process.stderr);
+
+  const execaRes = await subprocess;
+
+  // console.log('execaRes', execaRes);
+
+  const certDir = `${LE_CONFIG_HOME}/${domain}`;
+  console.log('acme.sh cert dir -- ', certDir);
+
+  const keyFile = `${certDir}/${domain}.key`;
+  const cerFile = `${certDir}/fullchain.cer`;
+
+  console.log('keyfile', keyFile);
+  console.log('cerFile', cerFile);
+
+  return { keyFile, cerFile };
+};
+
+exports.renewCert = async function(domain) {
+  const CMD = `/root/.acme.sh/acme.sh --renew  ${Boolean(LE_USE_STAGING) ? '--staging' : ''} ${
+    Boolean(DEBUG) ? '--debug' : ''
+  } --dns ${ACME_SH_DNS} -d '${domain}' --force --accountemail ${ACCOUNT_EMAIL}`;
+
+  console.log('CMD-->', CMD);
+
   const subprocess = execa('sh', [CMD], { shell: true });
   subprocess.stdout.pipe(process.stdout);
   subprocess.stderr.pipe(process.stderr);

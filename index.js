@@ -123,10 +123,9 @@ fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply
 
   const projObj = db
     .get('projectIds')
-    .find({certSecretName})
     .value();
 
-  // certObj = certObj || {};
+  // certObj = certObjsudo docker-compose down || {};
 
 //  console.log('insertDomainSecret inputs ---', domain, projectId, certSecretName, certObj);
 
@@ -134,6 +133,7 @@ fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply
 
   const { keyFileData, cerFileData } = getCertData(keyFile, cerFile);
   for (const _currentProj of projObj) {
+    if (_currentProj.certSecretName === certSecretName) {
   const rancherCertURL = `/project/${_currentProj.projectId}/certificates`;
 
   // eslint-disable-next-line no-await-in-loop
@@ -155,6 +155,7 @@ fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply
     console.log('update ssl cert', domain, d1.name);
   }
   }
+}
 });
 
 // Run the server!

@@ -6,12 +6,11 @@ const adapter = new FileSync("./db.json");
 
 const db = low(adapter);
 
-const certSecretName="wildcard-perftest-learnindialearn-org-ssl-certs"
+const certSecretName = "wildcard-learnindialearn-org-ssl-certs"
 
 console.log(certSecretName)
 let certObj = db
 .get('projectIds')
-.find({ certSecretName: certSecretName })
 .value();
 
 console.log(certObj)
