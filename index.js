@@ -10,7 +10,7 @@ const axios = require('axios');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 
-const { getCert, getCertData, renewCert, createWildCardName} = require('./cert');
+const { getCert, getCertData, renewCert, getSecretNameFromDomain} = require('./cert');
 
 assert(RANCHER_SERVER_API);
 assert(API_KEY);
@@ -43,7 +43,7 @@ const postSchema = {
 fastify.post('/insertDomainSecret', { schema: postSchema }, async (request, reply) => {
   const { domain, projectId } = request.body;
 
-  const certSecretName = await createWildCardName(domain)
+  const certSecretName = await getSecretNameFromDomain(domain)
   let certObj = db
     .get('certs')
     .find({ name: certSecretName })
@@ -114,7 +114,7 @@ fastify.get('/', async () => {
 fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply) => {
   const { domain } = request.body;
 
-  const certSecretName = await createWildCardName(domain);
+  const certSecretName = await getSecretNameFromDomain(domain);
   // let certObj = db
   //   .get('certs')
   //   .find({ name: certSecretName })
