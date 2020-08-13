@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 const { API_KEY, RANCHER_SERVER_API, LE_CONFIG_HOME } = process.env;
 
 const fastify = require('fastify')({
@@ -9,7 +10,7 @@ const axios = require('axios');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 
-const { getCert, getCertData } = require('./cert');
+const { getCert, getCertData, renewCert, getSecretNameFromDomain} = require('./cert');
 
 assert(RANCHER_SERVER_API);
 assert(API_KEY);
@@ -42,7 +43,7 @@ const postSchema = {
 fastify.post('/insertDomainSecret', { schema: postSchema }, async (request, reply) => {
   const { domain, projectId } = request.body;
 
-  const certSecretName = `${domain.replace(/\./g, '-').replace(/\*/g, 'wildcard')}-ssl-certs`;
+  const certSecretName =  getSecretNameFromDomain(domain)
   let certObj = db
     .get('certs')
     .find({ name: certSecretName })
@@ -108,6 +109,55 @@ fastify.post('/insertDomainSecret', { schema: postSchema }, async (request, repl
 
 fastify.get('/', async () => {
   return 'OK';
+});
+
+fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply) => {
+  const { domain } = request.body;
+
+  const certSecretName = getSecretNameFromDomain(domain);
+  // let certObj = db
+  //   .get('certs')
+  //   .find({ name: certSecretName })
+  //   .value();
+  const renewedCertObj = await renewCert(domain);
+
+  const projObj = db
+    .get('projectIds')
+    .value();
+
+  // certObj = certObjsudo docker-compose down || {};
+
+//  console.log('insertDomainSecret inputs ---', domain, projectId, certSecretName, certObj);
+
+  const { keyFile, cerFile } = renewedCertObj;
+
+  const { keyFileData, cerFileData } = getCertData(keyFile, cerFile);
+  for (const _currentProj of projObj) {
+    if (_currentProj.certSecretName === certSecretName) {
+      console.log('found existing project', _currentProj.projectId);
+      const rancherCertURL = `/project/${_currentProj.projectId}/certificates`;
+  // eslint-disable-next-line no-await-in-loop
+      console.log('rancher url', rancherCertURL);
+      const { data } = await instance.get(`${rancherCertURL}?name=${certSecretName}`);
+      console.log('cert name if exists in project--->>>', data && data.name);
+      if (data.data && data.data.length) {
+    // cert exists on rancher, update it
+        console.log('cert id--', data.data[0].id);
+        const certId = data.data[0].id;
+    // const { data: d } = await instance.get(`${rancherCertURL}/${certId}`);
+    // console.log('cert data--', d);
+        const { data: d1 } = await instance.put(`${rancherCertURL}/${certId}`, {
+          id: certId,
+          key: keyFileData,
+          certs: cerFileData
+        });
+
+    console.log('update ssl cert', domain, d1.name);
+    }
+  }
+}
+
+return { hello: 'world' };
 });
 
 // Run the server!
