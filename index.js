@@ -111,7 +111,16 @@ fastify.get('/', async () => {
   return 'OK';
 });
 
-fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply) => {
+const renewSchema = {
+  body: {
+    type: 'object',
+    required: ['domain'],
+    properties: {
+      domain: { type: 'string' }
+    }
+  }
+};
+fastify.post('/renewDomainSecret', { schema: renewSchema }, async (request, reply) => {
   const { domain } = request.body;
 
   const certSecretName = getSecretNameFromDomain(domain);
@@ -125,9 +134,7 @@ fastify.post('/renewDomainSecret', { schema: postSchema }, async (request, reply
     .get('projectIds')
     .value();
 
-  // certObj = certObjsudo docker-compose down || {};
-
-//  console.log('insertDomainSecret inputs ---', domain, projectId, certSecretName, certObj);
+  console.log('renewDomainSecret inputs ---', domain, certSecretName);
 
   const { keyFile, cerFile } = renewedCertObj;
 
