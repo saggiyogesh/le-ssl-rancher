@@ -8,7 +8,7 @@
   "author": "Yogesh Agarwal",
   "private": true,
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "execa": "^4.0.0",
     "fastify": "^2.15.1",
     "lowdb": "^1.0.0"
